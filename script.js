@@ -61,70 +61,16 @@ function toggleMenu() {
     toggleSidebar();
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Render all game sections
-    renderGames('topGames', games);
-    renderGames('exclusiveGames', exclusiveGames);
-    renderGames('liveGames', liveGames);
-    
-    // Initialize sidebar link handlers
-    closeSidebarOnLinkClick();
-    
-    // Category filter functionality
-    const categoryButtons = document.querySelectorAll('.category-btn');
-    categoryButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            categoryButtons.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            console.log('Выбрана категория:', this.textContent);
-        });
-    });
-    
-    // Arrow buttons functionality
-    const arrowButtons = document.querySelectorAll('.arrow-btn');
-    arrowButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            console.log('Нажата кнопка стрелки');
-            // Здесь можно добавить функционал прокрутки
-        });
-    });
-    
-    // View all buttons functionality
-    const viewAllButtons = document.querySelectorAll('.view-all-btn');
-    viewAllButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            console.log('Показать все игры');
-            // Здесь можно добавить функционал показа всех игр
-        });
-    });
-    
-    // Mobile bottom nav functionality
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach((item, index) => {
-        item.addEventListener('click', function(e) {
-            // First item (menu) opens sidebar
-            if (index === 0) {
-                e.preventDefault();
-                toggleSidebar();
-            }
-            navItems.forEach(nav => nav.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-    
-    console.log('Сайт инициализирован успешно!');
-});
-
 // Slider functionality
 let currentSlide = 0;
-const slides = document.querySelectorAll('.slide');
-const dots = document.querySelectorAll('.dot');
-const totalSlides = slides.length;
 let autoSlideInterval;
 
 // Function to show specific slide
 function showSlide(index) {
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    const totalSlides = slides.length;
+    
     if (index >= totalSlides) {
         currentSlide = 0;
     } else if (index < 0) {
@@ -134,7 +80,9 @@ function showSlide(index) {
     }
 
     const sliderTrack = document.getElementById('sliderTrack');
-    sliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    if (sliderTrack) {
+        sliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
 
     // Update dots
     dots.forEach((dot, i) => {
@@ -178,40 +126,95 @@ function resetAutoSlide() {
     startAutoSlide();
 }
 
-// Initialize slider
+// Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    showSlide(0);
-    startAutoSlide();
-
-    // Pause auto slide on hover
+    // Initialize sidebar link handlers
+    closeSidebarOnLinkClick();
+    
+    // Category filter functionality
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    categoryButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            categoryButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            console.log('Выбрана категория:', this.textContent);
+        });
+    });
+    
+    // Arrow buttons functionality
+    const arrowButtons = document.querySelectorAll('.arrow-btn');
+    arrowButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            console.log('Нажата кнопка стрелки');
+        });
+    });
+    
+    // View all buttons functionality
+    const viewAllButtons = document.querySelectorAll('.view-all-btn');
+    viewAllButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            console.log('Показать все игры');
+        });
+    });
+    
+    // Mobile bottom nav functionality - ИСПРАВЛЕНО
+    const navItems = document.querySelectorAll('.mobile-bottom-nav .nav-item');
+    console.log('Найдено элементов навигации:', navItems.length);
+    
+    navItems.forEach((item, index) => {
+        item.addEventListener('click', function(e) {
+            console.log('Клик по элементу навигации:', index);
+            
+            // First item (menu) opens sidebar
+            if (index === 0) {
+                e.preventDefault();
+                console.log('Открываем сайдбар');
+                toggleSidebar();
+            }
+            
+            // Set active state
+            navItems.forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Initialize slider
     const sliderWrapper = document.querySelector('.slider-wrapper');
-    sliderWrapper.addEventListener('mouseenter', () => {
-        clearInterval(autoSlideInterval);
-    });
-
-    sliderWrapper.addEventListener('mouseleave', () => {
+    if (sliderWrapper) {
+        showSlide(0);
         startAutoSlide();
-    });
 
-    // Touch support for mobile
-    let touchStartX = 0;
-    let touchEndX = 0;
+        // Pause auto slide on hover
+        sliderWrapper.addEventListener('mouseenter', () => {
+            clearInterval(autoSlideInterval);
+        });
 
-    sliderWrapper.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    });
+        sliderWrapper.addEventListener('mouseleave', () => {
+            startAutoSlide();
+        });
 
-    sliderWrapper.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
+        // Touch support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
 
-    function handleSwipe() {
-        if (touchEndX < touchStartX - 50) {
-            nextSlide();
-        }
-        if (touchEndX > touchStartX + 50) {
-            prevSlide();
+        sliderWrapper.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        sliderWrapper.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + 50) {
+                prevSlide();
+            }
         }
     }
+    
+    console.log('Сайт инициализирован успешно!');
 });
