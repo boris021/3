@@ -56,6 +56,14 @@ body {
     color: white;
     border: 1px solid #444;
 }
+.btn-login a {
+    color: white;
+    text-decoration: none;
+}
+.btn-register a {
+    color: white;
+    text-decoration: none;
+}
 
 .btn-register {
     background: #2ecc71;
